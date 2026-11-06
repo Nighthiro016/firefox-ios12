@@ -11,6 +11,10 @@
 #   自带的 swiftc/clang + iPhoneOS SDK 全量编 App 侧 4 个 target，与正式构建同编译器同 SDK，
 #   几分钟）。不过就不推送 main、也不启动 4～5 小时的 Gecko 构建。
 # - 手动 dispatch 勾 check_only = 只跑合并预演 + 编译检查，不推送、不构建、不发版。
+# - 合并冲突自动解决（0.20.x 起）：tools/development/sync/resolve-conflicts.sh 按白名单
+#   逐路径解决（fork 的同步式 prompt / XP_IOS socket pref / iOS 12 CG 与 CVBuffer
+#   守卫 / Firefox 159 的 nsWindow 重基 + iOS 12 守卫 / nsHttpHandler UA 补丁重装），
+#   白名单之外的路径一律报错停下等人工。解决后仍要过编译检查才推送。
 
 name: Sync upstream & build release
 
@@ -71,7 +75,10 @@ jobs:
           else
             SHORT="$(git rev-parse --short upstream/main)"
             BASE="$(git rev-parse HEAD)"
-            git merge --no-ff --no-edit -m "chore: merge upstream/main $SHORT" upstream/main
+            if ! git merge --no-ff --no-edit -m "chore: merge upstream/main $SHORT" upstream/main; then
+              echo "merge conflicted; running the iOS 12 conflict auto-resolver"
+              bash tools/development/sync/resolve-conflicts.sh
+            fi
             KEEP_DIR="$(mktemp -d)"
             for f in .github/workflows/sync-upstream.yml .github/workflows/build-nojemalloc.yml; do
               if [ -f "$f" ]; then
