@@ -10,6 +10,7 @@ import UIKit
 
 
 final class PromptPresenter: PromptPresenting {
+    private var beforeUnloadAlerts: [String: PromptAlertController] = [:]
     private var selectPickers: [String: SelectPicker] = [:]
     private var colorPickers: [String: ColorPicker] = [:]
     private var dateTimePickers: [String: DateTimePicker] = [:]
@@ -32,6 +33,10 @@ final class PromptPresenter: PromptPresenting {
 
         case .auth(let request):
             presentAuth(request: request, completion: completion)
+
+        case .beforeUnload(let request):
+            presentBeforeUnload(request: request, completion: completion)
+
 
         case .folderUpload(let request):
             presentFolderUpload(request: request, completion: completion)
@@ -67,6 +72,7 @@ final class PromptPresenter: PromptPresenting {
             // Gecko fires dismiss when native date UI steals focus; the picker owns completion.
             return
         }
+        beforeUnloadAlerts.removeValue(forKey: promptID)?.dismiss(animated: true)
         selectPickers.removeValue(forKey: promptID)?.cancelAndDismiss()
         colorPickers.removeValue(forKey: promptID)?.cancelAndDismiss()
         dateTimePickers.removeValue(forKey: promptID)?.cancelAndDismiss()
@@ -236,6 +242,33 @@ final class PromptPresenter: PromptPresenting {
             response = .auth(username: username, password: password)
             finish(response)
         })
+        presenter.present(alert, animated: true)
+    }
+
+    // Upstream 0.20.x beforeunload prompt, ported to the fork's sync
+    // (no Concurrency) style. beforeUnloadAlerts also lets dismiss(promptID:)
+    // cancel the alert when Gecko dismisses the prompt itself.
+    private func presentBeforeUnload(request: BeforeUnloadPromptRequest, completion: @escaping (PromptResponse?) -> Void) {
+        guard let presenter = UIApplication.shared.topViewController() else {
+            completion(nil)
+            return
+        }
+
+        var allowed = false
+        let alert = PromptAlertController(
+            title: NSLocalizedString("Leave Page?", comment: ""),
+            message: NSLocalizedString("Changes you made may not be saved.", comment: ""),
+            preferredStyle: .alert
+        )
+        alert.onDismissed = { [weak self] in
+            self?.beforeUnloadAlerts.removeValue(forKey: request.id)
+            completion(.beforeUnload(allowed: allowed))
+        }
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Stay", comment: ""), style: .cancel))
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Leave", comment: ""), style: .destructive) { _ in
+            allowed = true
+        })
+        beforeUnloadAlerts[request.id] = alert
         presenter.present(alert, animated: true)
     }
 

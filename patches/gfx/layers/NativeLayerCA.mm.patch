@@ -230,15 +230,15 @@ index 0d8cd5a..af933a2 100644
  #ifdef NIGHTLY_BUILD
      if (StaticPrefs::gfx_core_animation_specialize_video_log()) {
        NSLog(@"VIDEO_LOG: EnqueueSurface failed on allocating sample buffer.");
-@@ -1843,7 +1969,10 @@ bool NativeLayerCARepresentation::ApplyChanges(
-   }
- 
-   if (aSpecializeVideo && mMutatedIsDRM) {
--    ((AVSampleBufferDisplayLayer*)mContentCALayer).preventsCapture = aIsDRM;
-+    // preventsCapture is iOS 13+.
-+    if (__builtin_available(iOS 13.0, *)) {
-+      ((AVSampleBufferDisplayLayer*)mContentCALayer).preventsCapture = aIsDRM;
-+    }
-   }
- 
+@@ -1820,6 +1946,9 @@ bool NativeLayerCARepresentation::ApplyChanges(
+         [(AVSampleBufferDisplayLayer*)mContentCALayer
+             setControlTimebase:timebase];
+         CFRelease(timebase);
+-        ((AVSampleBufferDisplayLayer*)mContentCALayer).preventsCapture = aIsDRM;
++        // preventsCapture is iOS 13+ (AVSampleBufferDisplayLayer property).
++        if (__builtin_available(iOS 13.0, *)) {
++          ((AVSampleBufferDisplayLayer*)mContentCALayer).preventsCapture = aIsDRM;
++        }
+         if (aIsDRM) {
+           mProtectedBackingLayer = [[CALayer layer] retain];
    bool shouldTintOpaqueness = StaticPrefs::gfx_core_animation_tint_opaque();

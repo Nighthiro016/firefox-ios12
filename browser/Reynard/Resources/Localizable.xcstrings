@@ -7045,6 +7045,16 @@
         }
       }
     },
+    "Changes you made may not be saved." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changes you made may not be saved."
+          }
+        }
+      }
+    },
     "Choose File" : {
       "localizations" : {
         "cs" : {
@@ -8542,6 +8552,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cookie 與網站資料"
+          }
+        }
+      }
+    },
+    "Copy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy"
+          }
+        }
+      }
+    },
+    "Copy Contents" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Contents"
           }
         }
       }
@@ -15498,6 +15528,26 @@
         }
       }
     },
+    "Leave" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave"
+          }
+        }
+      }
+    },
+    "Leave Page?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave Page?"
+          }
+        }
+      }
+    },
     "Light" : {
       "comment" : "Reader mode background color",
       "localizations" : {
@@ -18986,6 +19036,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "在新標籤頁中開啟"
+          }
+        }
+      }
+    },
+    "Open in New Tabs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open in New Tabs"
           }
         }
       }
@@ -26528,6 +26588,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "排序方式"
+          }
+        }
+      }
+    },
+    "Stay" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stay"
           }
         }
       }

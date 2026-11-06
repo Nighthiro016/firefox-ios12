@@ -1,8 +1,9 @@
 diff --git a/netwerk/protocol/http/nsHttpHandler.cpp b/netwerk/protocol/http/nsHttpHandler.cpp
-index 8f93ab816133..9306e5f13061 100644
 --- a/netwerk/protocol/http/nsHttpHandler.cpp
 +++ b/netwerk/protocol/http/nsHttpHandler.cpp
-@@ -113,6 +113,10 @@
+@@ -107,8 +107,12 @@
+ 
+ #if defined(XP_MACOSX)
  #  include <CoreServices/CoreServices.h>
  #endif
  
@@ -13,32 +14,7 @@ index 8f93ab816133..9306e5f13061 100644
  //-----------------------------------------------------------------------------
  #include "mozilla/net/HttpChannelChild.h"
  
-@@ -667,6 +667,23 @@ nsresult nsHttpHandler::InitConnectionMgr() {
-                         mBeConservativeForProxy);
- }
- 
-+nsresult nsHttpHandler::StoreServerCertHashes(
-+    nsHttpConnectionInfo* aConnInfo, bool aNoSpdy, bool aNoHttp3,
-+    nsTArray<RefPtr<nsIWebTransportHash>>&& aServerCertHashes) {
-+  if (nsHttpConnectionMgr* connMgr = ConnMgr()) {
-+    return connMgr->StoreServerCertHashes(aConnInfo, aNoSpdy, aNoHttp3,
-+                                          std::move(aServerCertHashes));
-+  }
-+
-+  if (HttpConnectionMgrParent* connMgrParent =
-+          mConnMgr ? mConnMgr->AsHttpConnectionMgrParent() : nullptr) {
-+    return connMgrParent->StoreServerCertHashes(aConnInfo, aNoSpdy, aNoHttp3,
-+                                                std::move(aServerCertHashes));
-+  }
-+
-+  return NS_ERROR_NOT_AVAILABLE;
-+}
-+
- // We're using RequestOverride because this can get called when these are
- // set by Fetch from the old request. We need to pass a function pointer to
- // let GetDictionaryFor suspend the channel before starting the async
-@@ -1167,9 +1188,21 @@ void nsHttpHandler::InitUserAgentComponents() {
- #endif  // ANDROID
+@@ -1187,8 +1191,20 @@
  
  #if defined(XP_IOS)
 -  // Freeze the iOS version to 18.0, use an underscore separator to avoid
